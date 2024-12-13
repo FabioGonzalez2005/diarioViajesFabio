@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ViajeDAO {
-
     @Insert
     suspend fun insertarViaje(viaje: Viaje)
 
