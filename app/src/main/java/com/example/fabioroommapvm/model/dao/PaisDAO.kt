@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PaisDAO {
-
     @Insert
     suspend fun insertarPais(pais: Pais)
 
@@ -18,8 +17,4 @@ interface PaisDAO {
 
     @Query("SELECT * FROM Paises")
     fun obtenerTodosPaises(): Flow<List<Pais>>
-
-    @Transaction
-    @Query("SELECT * FROM Paises WHERE idPais = :idPais")
-    fun obtenerPaisConRegiones(idPais: Int): Flow<PaisConRegiones> // Obtener país con regiones asociadas
 }
