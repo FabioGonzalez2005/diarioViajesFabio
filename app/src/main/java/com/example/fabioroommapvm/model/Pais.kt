@@ -13,10 +13,10 @@ data class Pais(
 )
 
 data class RegionConPais(
-    @Embedded val region: Region,
+    @Embedded val pais: Pais,  // Embedding el Pais
     @Relation(
         parentColumn = "idPais",
         entityColumn = "idPais"
     )
-    val tiposRegiones: List<Pais> // Lista de tipos relacionados con el marcador.
+    val regiones: List<Region> // Lista de regiones relacionadas con el país
 )
