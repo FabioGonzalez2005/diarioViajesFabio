@@ -8,11 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ViajeDAO {
+
     @Insert
     suspend fun insertarViaje(viaje: Viaje)
-
-    @Query("SELECT * FROM Viajes WHERE idPais = :idPais")
-    fun obtenerViajesPorPais(idPais: Int): Flow<List<Viaje>> // Obtener viajes asociados a un país
 
     @Query("SELECT * FROM Viajes")
     fun obtenerTodosViajes(): Flow<List<Viaje>>
