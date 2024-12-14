@@ -51,6 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
             val continenteDao = db.continenteDao()
             val paisDao = db.paisDao()
             val regionDao = db.regionDao()
+            val viajeDao = db.viajeDao()
 
             // Verifica e inserta datos iniciales
             if (continenteDao.obtenerTodosContinentes().first().isEmpty()) {
@@ -61,6 +62,9 @@ abstract class AppDatabase : RoomDatabase() {
             }
             if (regionDao.obtenerTodasRegiones().first().isEmpty()) {
                 insertarDatosRegiones(regionDao, paisDao)
+            }
+            if (viajeDao.obtenerTodosViajes().first().isEmpty()) {
+                insertarDatosViajes(viajeDao, regionDao)
             }
         }
 
@@ -115,6 +119,25 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             )
             regiones.forEach { regionDao.insertarRegion(it) }
+        }
+
+        private suspend fun insertarDatosViajes(viajeDao: ViajeDAO, regionDao: RegionDAO) {
+            val regiones = regionDao.obtenerTodasRegiones().first()
+            val viajes = listOf(
+                Viaje(
+                    nombreViaje = "Gran Muralla",
+                    idRegion = regiones.first { it.nombreRegion == "Beijing" }.idRegion
+                ),
+                Viaje(
+                    nombreViaje = "Ruta del Modernismo",
+                    idRegion = regiones.first { it.nombreRegion == "Cataluña" }.idRegion
+                ),
+                Viaje(
+                    nombreViaje = "Costa Oeste",
+                    idRegion = regiones.first { it.nombreRegion == "California" }.idRegion
+                )
+            )
+            viajes.forEach { viajeDao.insertarViaje(it) }
         }
     }
 }
