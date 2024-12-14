@@ -19,6 +19,5 @@ import androidx.room.PrimaryKey
 data class Viaje(
     @PrimaryKey(autoGenerate = true) val idViaje: Int = 0,
     val nombreViaje: String,
-    val descripcion: String,
     val idRegion: Int // Relación con Region
 )
