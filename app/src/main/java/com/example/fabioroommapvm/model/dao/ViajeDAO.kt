@@ -12,9 +12,6 @@ interface ViajeDAO {
     @Insert
     suspend fun insertarViaje(viaje: Viaje)
 
-    @Query("SELECT * FROM Viajes WHERE idRegion = :idRegion")
-    fun obtenerViajesPorRegion(idRegion: Int): Flow<List<Viaje>>
-
     @Query("SELECT * FROM Viajes")
     fun obtenerTodosViajes(): Flow<List<Viaje>>
 }
