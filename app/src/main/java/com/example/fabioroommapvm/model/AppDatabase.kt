@@ -97,15 +97,21 @@ abstract class AppDatabase : RoomDatabase() {
             val regiones = listOf(
                 Region(
                     nombreRegion = "Beijing",
-                    idPais = paises.first { it.nombrePais == "China" }.idPais
+                    idPais = paises.first { it.nombrePais == "China" }.idPais,
+                    coordenadaX = 39.9042,
+                    coordenadaY = 116.4074
                 ),
                 Region(
                     nombreRegion = "Cataluña",
-                    idPais = paises.first { it.nombrePais == "España" }.idPais
+                    idPais = paises.first { it.nombrePais == "España" }.idPais,
+                    coordenadaX = 41.3851,
+                    coordenadaY = 2.1734
                 ),
                 Region(
                     nombreRegion = "California",
-                    idPais = paises.first { it.nombrePais == "Estados Unidos" }.idPais
+                    idPais = paises.first { it.nombrePais == "Estados Unidos" }.idPais,
+                    coordenadaX = 36.7783,
+                    coordenadaY = -119.4179
                 )
             )
             regiones.forEach { regionDao.insertarRegion(it) }
