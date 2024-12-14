@@ -8,11 +8,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RegionDAO {
+
     @Insert
     suspend fun insertarRegion(region: Region)
 
     @Query("SELECT * FROM Regiones WHERE idPais = :idPais")
-    fun obtenerRegionesPorPais(idPais: Int): Flow<List<Region>> // Obtener regiones asociadas a un país
+    fun obtenerRegionesPorPais(idPais: Int): Flow<List<Region>>
 
     @Query("SELECT * FROM Regiones")
     fun obtenerTodasRegiones(): Flow<List<Region>>
