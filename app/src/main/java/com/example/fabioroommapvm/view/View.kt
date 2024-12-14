@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,114 +14,171 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fabioroommapvm.R
-import com.example.fabioroommapvm.viewModel.MarcadorVistaModelo
-import com.utsman.osmandcompose.DefaultMapProperties
-import com.utsman.osmandcompose.Marker
-import com.utsman.osmandcompose.OpenStreetMap
-import com.utsman.osmandcompose.ZoomButtonVisibility
-import com.utsman.osmandcompose.rememberCameraState
-import com.utsman.osmandcompose.rememberMarkerState
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
-import org.osmdroid.tileprovider.tilesource.XYTileSource
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.util.MapTileIndex
-
-val GoogleSat: OnlineTileSourceBase = object : XYTileSource(
-    "Google-Sat",
-    0, 19, 256, ".png", arrayOf(
-        "https://mt0.google.com",
-        "https://mt1.google.com",
-        "https://mt2.google.com",
-        "https://mt3.google.com"
-    )
-) {
-    override fun getTileURLString(aTile: Long): String {
-        return baseUrl + "/vt/lyrs=s&x=" + MapTileIndex.getX(aTile) + "&y=" + MapTileIndex.getY(
-            aTile
-        ) + "&z=" + MapTileIndex.getZoom(aTile)
-    }
-}
+import com.example.fabioroommapvm.model.dataclasses.Continente
+import com.example.fabioroommapvm.model.dataclasses.Pais
+import com.example.fabioroommapvm.model.dataclasses.Region
+import com.example.fabioroommapvm.viewModel.UbicacionVistaModelo
 
 @Composable
-fun MapaVista(
+fun MenuVista(
     modifier: Modifier = Modifier,
-    vistaModelo: MarcadorVistaModelo,
-    context: Context // Contexto necesario para cargar los drawables
+    vistaModelo: UbicacionVistaModelo,
+    context: Context
 ) {
-    val marcadoresConTipo by vistaModelo.marcadoresConTipo.collectAsState(initial = emptyList())
+    var nombreViaje by remember { mutableStateOf("") }
+    var continenteSeleccionado by remember { mutableStateOf<Continente?>(null) }
+    var paisSeleccionado by remember { mutableStateOf<Pais?>(null) }
+    var regionSeleccionada by remember { mutableStateOf<Region?>(null) }
 
-    val cameraState = rememberCameraState {
-        geoPoint = GeoPoint(28.957375205489004, -13.554245657440829)
-        zoom = 17.0
-    }
+    var continenteMenuExpanded by remember { mutableStateOf(false) }
+    var paisMenuExpanded by remember { mutableStateOf(false) }
+    var regionMenuExpanded by remember { mutableStateOf(false) }
 
-    var mapProperties by remember {
-        mutableStateOf(DefaultMapProperties)
-    }
+    val continentes by vistaModelo.continentes.collectAsState(initial = emptyList())
+    val paises by vistaModelo.paises.collectAsState(initial = emptyList())
+    val regiones by vistaModelo.regiones.collectAsState(initial = emptyList())
 
-    SideEffect {
-        mapProperties = mapProperties
-            .copy(tileSources = GoogleSat)
-            .copy(isEnableRotationGesture = true)
-            .copy(zoomButtonVisibility = ZoomButtonVisibility.SHOW_AND_FADEOUT)
-    }
-
-    OpenStreetMap(
-        modifier = modifier.fillMaxSize(),
-        cameraState = cameraState,
-        properties = mapProperties
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        marcadoresConTipo.forEach { marcadorConTipo ->
-            val marcador = marcadorConTipo.marcador
-            val tipo = marcadorConTipo.tiposMarcadores[0].tituloTipoMarcador
+        OutlinedTextField(
+            value = nombreViaje,
+            onValueChange = { nombreViaje = it },
+            label = { Text("Nombre del viaje") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            val markerState = rememberMarkerState(
-                geoPoint = GeoPoint(marcador.coordenadaX, marcador.coordenadaY)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Dropdown para seleccionar continente
+        Box {
+            OutlinedTextField(
+                value = continenteSeleccionado?.nombreContinente ?: "Seleccione continente",
+                onValueChange = {},
+                label = { Text("Continente") },
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { continenteMenuExpanded = !continenteMenuExpanded }) {
+                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
 
-            // Selección del ícono según el tipo
-            val markerIcon = when (tipo) {
-                "Restaurante" -> context.getDrawable(R.drawable.restaurant)
-                "Supermercado" -> context.getDrawable(R.drawable.supermercado)
-                "Playa" -> context.getDrawable(R.drawable.playa)
-                "Biblioteca" -> context.getDrawable(R.drawable.biblioteca)
-                else -> context.getDrawable(org.osmdroid.library.R.drawable.marker_default)
-            }
-
-            // Crear el marcador con el ícono
-            Marker(
-                state = markerState,
-                title = marcador.tituloMarcador,
-                snippet = tipo,
-                icon = markerIcon
+            DropdownMenu(
+                expanded = continenteMenuExpanded,
+                onDismissRequest = { continenteMenuExpanded = false }
             ) {
-                Column(
-                    modifier = Modifier
-                        .size(180.dp)
-                        .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-                        .padding(15.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = it.title,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                    Text(
-                        text = it.snippet,
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                continentes.forEach { continente ->
+                    DropdownMenuItem(
+                        onClick = {
+                            continenteSeleccionado = continente
+                            paisSeleccionado = null
+                            regionSeleccionada = null
+                            continenteMenuExpanded = false
+                        },
+                        text = { Text(continente.nombreContinente) }
                     )
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Dropdown para seleccionar país
+        if (continenteSeleccionado != null) {
+            Box {
+                OutlinedTextField(
+                    value = paisSeleccionado?.nombrePais ?: "Seleccione país",
+                    onValueChange = {},
+                    label = { Text("País") },
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { paisMenuExpanded = !paisMenuExpanded }) {
+                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownMenu(
+                    expanded = paisMenuExpanded,
+                    onDismissRequest = { paisMenuExpanded = false }
+                ) {
+                    paises.filter { it.idContinente == continenteSeleccionado?.idContinente }.forEach { pais ->
+                        DropdownMenuItem(
+                            onClick = {
+                                paisSeleccionado = pais
+                                regionSeleccionada = null
+                                paisMenuExpanded = false
+                            },
+                            text = { Text(pais.nombrePais) }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Dropdown para seleccionar región
+        if (paisSeleccionado != null) {
+            Box {
+                OutlinedTextField(
+                    value = regionSeleccionada?.nombreRegion ?: "Seleccione región",
+                    onValueChange = {},
+                    label = { Text("Región") },
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { regionMenuExpanded = !regionMenuExpanded }) {
+                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownMenu(
+                    expanded = regionMenuExpanded,
+                    onDismissRequest = { regionMenuExpanded = false }
+                ) {
+                    regiones.filter { it.idPais == paisSeleccionado?.idPais }.forEach { region ->
+                        DropdownMenuItem(
+                            onClick = {
+                                regionSeleccionada = region
+                                regionMenuExpanded = false
+                            },
+                            text = { Text(region.nombreRegion) }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                // Acción para confirmar
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Confirmar viaje")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (regionSeleccionada != null) {
+            Text(
+                text = "Viaje a ${regionSeleccionada.nombreRegion}, ${paisSeleccionado?.nombrePais}, ${continenteSeleccionado?.nombreContinente}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .background(Color.Gray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
+                    .padding(8.dp)
+            )
+        }
     }
 }
-
