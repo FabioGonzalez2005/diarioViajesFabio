@@ -226,7 +226,15 @@ fun MenuVista(
                     fontSize = 16.sp,
                     modifier = Modifier.weight(1f)
                 )
-
+                IconButton(onClick = {
+                    viajesConfirmados = viajesConfirmados.filter { it.second != id }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Eliminar viaje",
+                        tint = Color.Red
+                    )
+                }
 
 
 
