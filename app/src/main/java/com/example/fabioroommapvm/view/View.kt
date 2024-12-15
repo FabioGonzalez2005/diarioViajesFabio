@@ -261,7 +261,19 @@ fun MenuVista(
                 OpenStreetMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraState = cameraState
-                )
+                ) {
+                    if (marcadorVisible) {
+                        val markerState = rememberMarkerState(
+                            geoPoint = GeoPoint(coordenadaX, coordenadaY)
+                        )
+                        Marker(
+                            state = markerState,
+                            title = "Ubicación seleccionada",
+                            snippet = "Coordenadas: $coordenadaX, $coordenadaY",
+                            icon = context.getDrawable(org.osmdroid.library.R.drawable.marker_default)
+                        ) {
+                    }
+                }
             }
         }
     }
