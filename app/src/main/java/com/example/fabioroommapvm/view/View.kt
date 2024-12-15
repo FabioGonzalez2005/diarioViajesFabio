@@ -236,7 +236,18 @@ fun MenuVista(
                     )
                 }
 
+                // Botón "Ver en mapa"
+                IconButton(onClick = {
+                    // Mostrar el mapa con las coordenadas del viaje seleccionado
+                    mapaVisible = true
+                    coordenadaX = regionSeleccionada?.coordenadaX ?: 0.0
+                    coordenadaY = regionSeleccionada?.coordenadaY ?: 0.0
+                    marcadorVisible = true
+                }) {
 
+                }
+            }
+        }
 
                 }
             }
