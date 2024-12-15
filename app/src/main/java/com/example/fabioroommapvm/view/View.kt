@@ -209,5 +209,26 @@ fun MenuVista(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Mostrar la lista de viajes confirmados con botón para eliminar
+        viajesConfirmados.forEach { (viaje, id) ->
+            Row(
+                modifier = Modifier
+                    .background(Color.Gray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = viaje,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.weight(1f)
+                )
+
+
+
+
                 }
             }
