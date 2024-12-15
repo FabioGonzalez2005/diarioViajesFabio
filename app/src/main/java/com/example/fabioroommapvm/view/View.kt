@@ -272,6 +272,31 @@ fun MenuVista(
                             snippet = "Coordenadas: $coordenadaX, $coordenadaY",
                             icon = context.getDrawable(org.osmdroid.library.R.drawable.marker_default)
                         ) {
+                            Column(
+                                modifier = Modifier
+                                    .size(180.dp)
+                                    .background(color = Color.White, shape = RoundedCornerShape(12.dp))
+                                    .padding(15.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = it.title,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                                Text(
+                                    text = it.snippet,
+                                    fontSize = 14.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
             }
