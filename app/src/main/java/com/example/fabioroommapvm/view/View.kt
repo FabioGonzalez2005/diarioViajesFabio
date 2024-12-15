@@ -253,5 +253,16 @@ fun MenuVista(
             }
         }
 
-                }
+        // Mostrar el mapa si el estado de mapaVisible es verdadero
+        if (mapaVisible) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                OpenStreetMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraState = cameraState
+                )
             }
+        }
+    }
+}
