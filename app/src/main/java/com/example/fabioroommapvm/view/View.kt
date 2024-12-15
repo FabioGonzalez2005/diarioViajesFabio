@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +20,11 @@ import com.example.fabioroommapvm.model.dataclasses.Continente
 import com.example.fabioroommapvm.model.dataclasses.Pais
 import com.example.fabioroommapvm.model.dataclasses.Region
 import com.example.fabioroommapvm.viewModel.UbicacionVistaModelo
+import com.utsman.osmandcompose.Marker
+import com.utsman.osmandcompose.OpenStreetMap
+import com.utsman.osmandcompose.rememberCameraState
+import com.utsman.osmandcompose.rememberMarkerState
+import org.osmdroid.util.GeoPoint
 
 @Composable
 fun MenuVista(
@@ -25,15 +32,29 @@ fun MenuVista(
     vistaModelo: UbicacionVistaModelo,
     context: Context
 ) {
+    // Estado para las selecciones
     var nombreViaje by remember { mutableStateOf("") }
     var continenteSeleccionado by remember { mutableStateOf<Continente?>(null) }
     var paisSeleccionado by remember { mutableStateOf<Pais?>(null) }
     var regionSeleccionada by remember { mutableStateOf<Region?>(null) }
+    var viajesConfirmados by remember { mutableStateOf<List<Pair<String, Int>>>(emptyList()) }
 
+    // Estado para el mapa y el marcador
+    var coordenadaX by remember { mutableStateOf(28.957375205489004) }
+    var coordenadaY by remember { mutableStateOf(-13.554245657440829) }
+    var marcadorVisible by remember { mutableStateOf(false) }
+    var mapaVisible by remember { mutableStateOf(false) }  // Estado para mostrar/ocultar el mapa
+    val cameraState = rememberCameraState {
+        geoPoint = GeoPoint(coordenadaX, coordenadaY)
+        zoom = 17.0
+    }
+
+    // Estado para los menús desplegables
     var continenteMenuExpanded by remember { mutableStateOf(false) }
     var paisMenuExpanded by remember { mutableStateOf(false) }
     var regionMenuExpanded by remember { mutableStateOf(false) }
 
+    // Obtener los datos
     val continentes by vistaModelo.continentes.collectAsState(initial = emptyList())
     val paises by vistaModelo.paises.collectAsState(initial = emptyList())
     val regiones by vistaModelo.regiones.collectAsState(initial = emptyList())
@@ -44,6 +65,7 @@ fun MenuVista(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Campo de nombre del viaje
         OutlinedTextField(
             value = nombreViaje,
             onValueChange = { nombreViaje = it },
@@ -161,7 +183,24 @@ fun MenuVista(
 
         Button(
             onClick = {
-                // Acción para confirmar
+                if (regionSeleccionada != null && paisSeleccionado != null && continenteSeleccionado != null && nombreViaje.isNotBlank()) {
+                    val nuevoViaje = "Viaje: $nombreViaje\n" +
+                            "Continente: ${continenteSeleccionado!!.nombreContinente}\n" +
+                            "País: ${paisSeleccionado!!.nombrePais}\n" +
+                            "Región: ${regionSeleccionada!!.nombreRegion}"
+
+                    // Asignamos un ID único al viaje
+                    val nuevoId = viajesConfirmados.size
+
+                    // Agregar el nuevo viaje a la lista
+                    viajesConfirmados = viajesConfirmados + (nuevoViaje to nuevoId)
+
+                    // Limpiar los campos para agregar otro viaje
+                    nombreViaje = ""
+                    continenteSeleccionado = null
+                    paisSeleccionado = null
+                    regionSeleccionada = null
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -170,15 +209,5 @@ fun MenuVista(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (regionSeleccionada != null) {
-            Text(
-                text = "Viaje a ${regionSeleccionada.nombreRegion}, ${paisSeleccionado?.nombrePais}, ${continenteSeleccionado?.nombreContinente}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .background(Color.Gray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
-                    .padding(8.dp)
-            )
-        }
-    }
-}
+                }
+            }
