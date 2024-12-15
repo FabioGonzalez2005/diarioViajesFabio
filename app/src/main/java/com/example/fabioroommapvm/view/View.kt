@@ -244,7 +244,11 @@ fun MenuVista(
                     coordenadaY = regionSeleccionada?.coordenadaY ?: 0.0
                     marcadorVisible = true
                 }) {
-
+                    Icon(
+                        imageVector = Icons.Default.Place,
+                        contentDescription = "Ver en mapa",
+                        tint = Color.Blue
+                    )
                 }
             }
         }
