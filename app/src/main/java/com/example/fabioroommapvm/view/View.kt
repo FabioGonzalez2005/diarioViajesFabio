@@ -124,7 +124,10 @@ fun MenuVista(
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { paisMenuExpanded = !paisMenuExpanded }) {
-                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null
+                            )
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -134,16 +137,17 @@ fun MenuVista(
                     expanded = paisMenuExpanded,
                     onDismissRequest = { paisMenuExpanded = false }
                 ) {
-                    paises.filter { it.idContinente == continenteSeleccionado?.idContinente }.forEach { pais ->
-                        DropdownMenuItem(
-                            onClick = {
-                                paisSeleccionado = pais
-                                regionSeleccionada = null
-                                paisMenuExpanded = false
-                            },
-                            text = { Text(pais.nombrePais) }
-                        )
-                    }
+                    paises.filter { it.idContinente == continenteSeleccionado?.idContinente }
+                        .forEach { pais ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    paisSeleccionado = pais
+                                    regionSeleccionada = null
+                                    paisMenuExpanded = false
+                                },
+                                text = { Text(pais.nombrePais) }
+                            )
+                        }
                 }
             }
         }
@@ -160,7 +164,10 @@ fun MenuVista(
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { regionMenuExpanded = !regionMenuExpanded }) {
-                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null
+                            )
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -267,7 +274,6 @@ fun MenuVista(
                 }
 
 
-
             }
         }
 
@@ -275,7 +281,11 @@ fun MenuVista(
         if (mapaVisible) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
                 OpenStreetMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraState = cameraState
@@ -293,7 +303,10 @@ fun MenuVista(
                             Column(
                                 modifier = Modifier
                                     .size(180.dp)
-                                    .background(color = Color.White, shape = RoundedCornerShape(12.dp))
+                                    .background(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
                                     .padding(15.dp),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -316,6 +329,22 @@ fun MenuVista(
                             }
                         }
                     }
+                }
+
+                // Agrega el botón flotante aquí
+                FloatingActionButton(
+                    onClick = {
+                        mapaVisible = false
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cerrar mapa"
+                    )
                 }
             }
         }
