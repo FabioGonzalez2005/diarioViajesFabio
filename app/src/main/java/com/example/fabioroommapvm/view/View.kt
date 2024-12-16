@@ -66,225 +66,15 @@ fun MenuVista(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(Color(0xFFADD8E6))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Campo de nombre del viaje
-        OutlinedTextField(
-            value = nombreViaje,
-            onValueChange = { nombreViaje = it },
-            label = { Text("Nombre del viaje") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dropdown para seleccionar continente
-        Box {
-            OutlinedTextField(
-                value = continenteSeleccionado?.nombreContinente ?: "Seleccione continente",
-                onValueChange = {},
-                label = { Text("Continente") },
-                readOnly = true,
-                trailingIcon = {
-                    IconButton(onClick = { continenteMenuExpanded = !continenteMenuExpanded }) {
-                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            DropdownMenu(
-                expanded = continenteMenuExpanded,
-                onDismissRequest = { continenteMenuExpanded = false }
-            ) {
-                continentes.forEach { continente ->
-                    DropdownMenuItem(
-                        onClick = {
-                            continenteSeleccionado = continente
-                            paisSeleccionado = null
-                            regionSeleccionada = null
-                            continenteMenuExpanded = false
-                        },
-                        text = { Text(continente.nombreContinente) }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dropdown para seleccionar país
-        if (continenteSeleccionado != null) {
-            Box {
-                OutlinedTextField(
-                    value = paisSeleccionado?.nombrePais ?: "Seleccione país",
-                    onValueChange = {},
-                    label = { Text("País") },
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { paisMenuExpanded = !paisMenuExpanded }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                DropdownMenu(
-                    expanded = paisMenuExpanded,
-                    onDismissRequest = { paisMenuExpanded = false }
-                ) {
-                    paises.filter { it.idContinente == continenteSeleccionado?.idContinente }
-                        .forEach { pais ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    paisSeleccionado = pais
-                                    regionSeleccionada = null
-                                    paisMenuExpanded = false
-                                },
-                                text = { Text(pais.nombrePais) }
-                            )
-                        }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dropdown para seleccionar región
-        if (paisSeleccionado != null) {
-            Box {
-                OutlinedTextField(
-                    value = regionSeleccionada?.nombreRegion ?: "Seleccione región",
-                    onValueChange = {},
-                    label = { Text("Región") },
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { regionMenuExpanded = !regionMenuExpanded }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                DropdownMenu(
-                    expanded = regionMenuExpanded,
-                    onDismissRequest = { regionMenuExpanded = false }
-                ) {
-                    regiones.filter { it.idPais == paisSeleccionado?.idPais }.forEach { region ->
-                        DropdownMenuItem(
-                            onClick = {
-                                regionSeleccionada = region
-                                regionMenuExpanded = false
-                            },
-                            text = { Text(region.nombreRegion) }
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                if (regionSeleccionada != null && paisSeleccionado != null && continenteSeleccionado != null && nombreViaje.isNotBlank()) {
-                    val nuevoViaje = "Viaje: $nombreViaje\n" +
-                            "Continente: ${continenteSeleccionado!!.nombreContinente}\n" +
-                            "País: ${paisSeleccionado!!.nombrePais}\n" +
-                            "Región: ${regionSeleccionada!!.nombreRegion}"
-
-                    // Asignamos un ID único al viaje
-                    val nuevoId = viajesConfirmados.size
-
-                    // Agregar el nuevo viaje a la lista
-                    viajesConfirmados = viajesConfirmados + (nuevoViaje to nuevoId)
-
-                    // Limpiar los campos para agregar otro viaje
-                    nombreViaje = ""
-                    continenteSeleccionado = null
-                    paisSeleccionado = null
-                    regionSeleccionada = null
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Confirmar viaje")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mostrar la lista de viajes confirmados con botón para eliminar
-        viajesConfirmados.forEach { (viaje, id) ->
-            Row(
-                modifier = Modifier
-                    .background(Color.Gray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = viaje,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                IconButton(onClick = {
-                    viajesConfirmados = viajesConfirmados.filter { it.second != id }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Eliminar viaje",
-                        tint = Color.Red
-                    )
-                }
-
-                // Botón "Ver en mapa"
-                IconButton(onClick = {
-                    // Ejecutar en corrutina
-                    vistaModelo.viewModelScope.launch {
-                        val nombreRegion = viaje.split("\n")[3].substringAfter("Región: ")
-                        val region = vistaModelo.obtenerRegionPorNombre(nombreRegion)
-
-                        region?.let {
-                            coordenadaX = it.coordenadaX
-                            coordenadaY = it.coordenadaY
-                            mapaVisible = true
-                            marcadorVisible = true
-
-                            // Actualizar posición de la cámara
-                            cameraState.geoPoint = GeoPoint(it.coordenadaX, it.coordenadaY)
-                            cameraState.zoom = 14.0
-                        }
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Place,
-                        contentDescription = "Ver en mapa",
-                        tint = Color.Blue
-                    )
-                }
-
-
-            }
-        }
-
         // Mostrar el mapa si el estado de mapaVisible es verdadero
         if (mapaVisible) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxSize()
             ) {
                 OpenStreetMap(
                     modifier = Modifier.fillMaxSize(),
@@ -303,10 +93,7 @@ fun MenuVista(
                             Column(
                                 modifier = Modifier
                                     .size(180.dp)
-                                    .background(
-                                        color = Color.White,
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
+                                    .background(color = Color.White, shape = RoundedCornerShape(12.dp))
                                     .padding(15.dp),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -345,6 +132,212 @@ fun MenuVista(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Cerrar mapa"
                     )
+                }
+            }
+        } else {
+            // Campo de nombre del viaje
+            OutlinedTextField(
+                value = nombreViaje,
+                onValueChange = { nombreViaje = it },
+                label = { Text("Nombre del viaje") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown para seleccionar continente
+            Box {
+                OutlinedTextField(
+                    value = continenteSeleccionado?.nombreContinente ?: "Seleccione continente",
+                    onValueChange = {},
+                    label = { Text("Continente") },
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { continenteMenuExpanded = !continenteMenuExpanded }) {
+                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                DropdownMenu(
+                    expanded = continenteMenuExpanded,
+                    onDismissRequest = { continenteMenuExpanded = false }
+                ) {
+                    continentes.forEach { continente ->
+                        DropdownMenuItem(
+                            onClick = {
+                                continenteSeleccionado = continente
+                                paisSeleccionado = null
+                                regionSeleccionada = null
+                                continenteMenuExpanded = false
+                            },
+                            text = { Text(continente.nombreContinente) }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown para seleccionar país
+            if (continenteSeleccionado != null) {
+                Box {
+                    OutlinedTextField(
+                        value = paisSeleccionado?.nombrePais ?: "Seleccione país",
+                        onValueChange = {},
+                        label = { Text("País") },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { paisMenuExpanded = !paisMenuExpanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DropdownMenu(
+                        expanded = paisMenuExpanded,
+                        onDismissRequest = { paisMenuExpanded = false }
+                    ) {
+                        paises.filter { it.idContinente == continenteSeleccionado?.idContinente }
+                            .forEach { pais ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        paisSeleccionado = pais
+                                        regionSeleccionada = null
+                                        paisMenuExpanded = false
+                                    },
+                                    text = { Text(pais.nombrePais) }
+                                )
+                            }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown para seleccionar región
+            if (paisSeleccionado != null) {
+                Box {
+                    OutlinedTextField(
+                        value = regionSeleccionada?.nombreRegion ?: "Seleccione región",
+                        onValueChange = {},
+                        label = { Text("Región") },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { regionMenuExpanded = !regionMenuExpanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DropdownMenu(
+                        expanded = regionMenuExpanded,
+                        onDismissRequest = { regionMenuExpanded = false }
+                    ) {
+                        regiones.filter { it.idPais == paisSeleccionado?.idPais }.forEach { region ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    regionSeleccionada = region
+                                    regionMenuExpanded = false
+                                },
+                                text = { Text(region.nombreRegion) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if (regionSeleccionada != null && paisSeleccionado != null && continenteSeleccionado != null && nombreViaje.isNotBlank()) {
+                        val nuevoViaje = "Viaje: $nombreViaje\n" +
+                                "Continente: ${continenteSeleccionado!!.nombreContinente}\n" +
+                                "País: ${paisSeleccionado!!.nombrePais}\n" +
+                                "Región: ${regionSeleccionada!!.nombreRegion}"
+
+                        // Asignamos un ID único al viaje
+                        val nuevoId = viajesConfirmados.size
+
+                        // Agregar el nuevo viaje a la lista
+                        viajesConfirmados = viajesConfirmados + (nuevoViaje to nuevoId)
+
+                        // Limpiar los campos para agregar otro viaje
+                        nombreViaje = ""
+                        continenteSeleccionado = null
+                        paisSeleccionado = null
+                        regionSeleccionada = null
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Confirmar viaje")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Mostrar la lista de viajes confirmados con botón para eliminar
+            viajesConfirmados.forEach { (viaje, id) ->
+                Row(
+                    modifier = Modifier
+                        .background(Color.Gray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = viaje,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = {
+                        viajesConfirmados = viajesConfirmados.filter { it.second != id }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Eliminar viaje",
+                            tint = Color.Red
+                        )
+                    }
+
+                    // Botón "Ver en mapa"
+                    IconButton(onClick = {
+                        // Ejecutar en corrutina
+                        vistaModelo.viewModelScope.launch {
+                            val nombreRegion = viaje.split("\n")[3].substringAfter("Región: ")
+                            val region = vistaModelo.obtenerRegionPorNombre(nombreRegion)
+
+                            region?.let {
+                                coordenadaX = it.coordenadaX
+                                coordenadaY = it.coordenadaY
+                                mapaVisible = true
+                                marcadorVisible = true
+
+                                // Actualizar posición de la cámara
+                                cameraState.geoPoint = GeoPoint(it.coordenadaX, it.coordenadaY)
+                                cameraState.zoom = 14.0
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Place,
+                            contentDescription = "Ver en mapa",
+                            tint = Color.Blue
+                        )
+                    }
                 }
             }
         }
