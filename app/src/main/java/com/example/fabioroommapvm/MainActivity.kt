@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fabioroommapvm.model.AppDatabase
 import com.example.fabioroommapvm.ui.theme.ViewModelRMTheme
-import com.example.fabioroommapvm.view.MapaVista
+import com.example.fabioroommapvm.view.MenuVista
 import com.example.fabioroommapvm.viewModel.UbicacionVistaModelo
 
 class MainActivity : ComponentActivity() {
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // Renderizamos la vista del mapa
-                    MapaVista(
+                    MenuVista(
                         modifier = Modifier.padding(innerPadding),
                         vistaModelo = vistaModelo,
                         context = this // Este contexto es necesario para que funcione la aplicación
