@@ -1,6 +1,7 @@
 package com.example.fabioroommapvm.model.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.fabioroommapvm.model.dataclasses.Pais
@@ -17,4 +18,7 @@ interface PaisDAO {
 
     @Query("SELECT * FROM Paises")
     fun obtenerTodosPaises(): Flow<List<Pais>>
+
+    @Delete
+    suspend fun eliminarPais(pais: Pais)
 }

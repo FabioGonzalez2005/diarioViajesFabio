@@ -1,6 +1,7 @@
 package com.example.fabioroommapvm.model.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.fabioroommapvm.model.dataclasses.Continente
@@ -14,4 +15,7 @@ interface ContinenteDAO {
 
     @Query("SELECT * FROM Continentes")
     fun obtenerTodosContinentes(): Flow<List<Continente>>
+
+    @Delete
+    suspend fun eliminarContinente(continente: Continente)
 }
