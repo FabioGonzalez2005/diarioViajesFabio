@@ -37,5 +37,10 @@ class UbicacionVistaModelo(
         val regiones = regionDao.obtenerTodasRegiones().first()
         return regiones.firstOrNull { it.nombreRegion == nombre }
     }
+    
+    suspend fun insertarViaje(viaje: Viaje) {
+        viajeDao.insertarViaje(viaje)
+    }
+
 
 }

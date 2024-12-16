@@ -22,6 +22,7 @@ import com.example.fabioroommapvm.R
 import com.example.fabioroommapvm.model.dataclasses.Continente
 import com.example.fabioroommapvm.model.dataclasses.Pais
 import com.example.fabioroommapvm.model.dataclasses.Region
+import com.example.fabioroommapvm.model.dataclasses.Viaje
 import com.example.fabioroommapvm.viewModel.UbicacionVistaModelo
 import com.utsman.osmandcompose.Marker
 import com.utsman.osmandcompose.OpenStreetMap
@@ -271,6 +272,20 @@ fun MenuVista(
 
                         // Agregar el nuevo viaje a la lista
                         viajesConfirmados = viajesConfirmados + (nuevoViaje to nuevoId)
+
+                        vistaModelo.viewModelScope.launch {
+                            val nuevoViaje = Viaje(
+                                nombreViaje = nombreViaje,
+                                idRegion = regionSeleccionada!!.idRegion // Vinculación con la región seleccionada
+                            )
+                            vistaModelo.insertarViaje(nuevoViaje)
+
+                            // Limpiar los campos para agregar otro viaje
+                            nombreViaje = ""
+                            continenteSeleccionado = null
+                            paisSeleccionado = null
+                            regionSeleccionada = null
+                        }
 
                         // Limpiar los campos para agregar otro viaje
                         nombreViaje = ""
