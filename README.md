@@ -1,5 +1,5 @@
 
-# 📱 **diarioViajesFabio** ✈️
+# ✈️ **diarioViajesFabio** 
 
 ## 🌟 **Descripción**
 
@@ -24,8 +24,11 @@ La aplicación utiliza una base de datos con las siguientes tablas relacionadas:
 ## 🗄️ **Base de Datos Integrada**
 - Almacenamiento de marcadores en una base de datos.
 
-## **Resultado del mapa**
-![mapaResultado](https://github.com/user-attachments/assets/506e6cab-373b-4953-806a-8dd9800fdfce)
+## **Resultado de la aplicación**
+![image](https://github.com/user-attachments/assets/641c41f1-7def-4cb7-8e0f-85cc3ec6c053)
+![image](https://github.com/user-attachments/assets/3956e20d-422b-4c1e-be77-385a50757b7d)
+
+
 
 ## Instalación del repositorio:
    ```bash
