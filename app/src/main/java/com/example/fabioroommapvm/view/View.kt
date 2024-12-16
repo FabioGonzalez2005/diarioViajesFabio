@@ -16,6 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewModelScope
+import com.example.fabioroommapvm.R
 import com.example.fabioroommapvm.model.dataclasses.Continente
 import com.example.fabioroommapvm.model.dataclasses.Pais
 import com.example.fabioroommapvm.model.dataclasses.Region
@@ -24,6 +27,7 @@ import com.utsman.osmandcompose.Marker
 import com.utsman.osmandcompose.OpenStreetMap
 import com.utsman.osmandcompose.rememberCameraState
 import com.utsman.osmandcompose.rememberMarkerState
+import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -238,11 +242,22 @@ fun MenuVista(
 
                 // Botón "Ver en mapa"
                 IconButton(onClick = {
-                    // Mostrar el mapa con las coordenadas del viaje seleccionado
-                    mapaVisible = true
-                    coordenadaX = regionSeleccionada?.coordenadaX ?: 0.0
-                    coordenadaY = regionSeleccionada?.coordenadaY ?: 0.0
-                    marcadorVisible = true
+                    // Ejecutar en corrutina
+                    vistaModelo.viewModelScope.launch {
+                        val nombreRegion = viaje.split("\n")[3].substringAfter("Región: ")
+                        val region = vistaModelo.obtenerRegionPorNombre(nombreRegion)
+
+                        region?.let {
+                            coordenadaX = it.coordenadaX
+                            coordenadaY = it.coordenadaY
+                            mapaVisible = true
+                            marcadorVisible = true
+
+                            // Actualizar posición de la cámara
+                            cameraState.geoPoint = GeoPoint(it.coordenadaX, it.coordenadaY)
+                            cameraState.zoom = 17.0
+                        }
+                    }
                 }) {
                     Icon(
                         imageVector = Icons.Default.Place,
@@ -250,6 +265,9 @@ fun MenuVista(
                         tint = Color.Blue
                     )
                 }
+
+
+
             }
         }
 
@@ -270,7 +288,7 @@ fun MenuVista(
                             state = markerState,
                             title = "Ubicación seleccionada",
                             snippet = "Coordenadas: $coordenadaX, $coordenadaY",
-                            icon = context.getDrawable(org.osmdroid.library.R.drawable.marker_default)
+                            icon = ContextCompat.getDrawable(context, R.drawable.alfiler)
                         ) {
                             Column(
                                 modifier = Modifier
