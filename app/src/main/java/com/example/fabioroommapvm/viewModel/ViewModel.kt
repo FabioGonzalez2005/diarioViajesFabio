@@ -10,6 +10,8 @@ import com.example.fabioroommapvm.model.dataclasses.Pais
 import com.example.fabioroommapvm.model.dataclasses.Region
 import com.example.fabioroommapvm.model.dataclasses.Viaje
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 // Clase ViewModel que conecta la capa de datos con la interfaz de usuario.
 class UbicacionVistaModelo(
@@ -30,4 +32,10 @@ class UbicacionVistaModelo(
 
     // Flujo que proporciona una lista de viajes desde la base de datos.
     val viajes: Flow<List<Viaje>> = viajeDao.obtenerTodosViajes()
+
+    suspend fun obtenerRegionPorNombre(nombre: String): Region? {
+        val regiones = regionDao.obtenerTodasRegiones().first()
+        return regiones.firstOrNull { it.nombreRegion == nombre }
+    }
+
 }
