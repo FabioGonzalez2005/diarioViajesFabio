@@ -255,7 +255,7 @@ fun MenuVista(
 
                             // Actualizar posición de la cámara
                             cameraState.geoPoint = GeoPoint(it.coordenadaX, it.coordenadaY)
-                            cameraState.zoom = 17.0
+                            cameraState.zoom = 14.0
                         }
                     }
                 }) {
